@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>《粵語流行曲中的聲調與旋律配合》研究問卷與數據分析</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter & Noto Sans TC -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Chart.js CDN for Analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'Noto Sans TC', 'sans-serif'],
+          },
+          colors: {
+            hku: {
+              navy: '#002147',
+              blue: '#0055A5',
+              gold: '#C5A059',
+              lightBg: '#F4F7FA',
+              cardBg: '#FFFFFF',
+              border: '#E2E8F0',
+              accent: '#0D9488'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', 'Noto Sans TC', sans-serif;
+      background-color: #F4F7FA;
+      color: #1E293B;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #F1F5F9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #94A3B8;
+      border-radius: 3px;
+    }
+    .scale-rating-input:checked + label {
+      background-color: #0055A5;
+      color: #FFFFFF;
+      border-color: #0055A5;
+      font-weight: 700;
+      box-shadow: 0 4px 6px -1px rgba(0, 85, 165, 0.3);
+    }
+    .choice-pill-input:checked + label {
+      background-color: #002147;
+      color: #FFFFFF;
+      border-color: #002147;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between antialiased selection:bg-hku-blue selection:text-white">
+
+  <!-- Header Section -->
+  <header class="bg-hku-navy text-white shadow-md border-b-4 border-hku-gold sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center font-bold text-hku-gold border border-hku-gold/40 text-sm">
+          HKU
+        </div>
+        <div>
+          <h1 class="text-base md:text-lg font-bold tracking-wide">香港大學言語與聽覺科學研究</h1>
+          <p class="text-xs text-slate-300">CEDU9001 - 粵語聲調與旋律配合研究</p>
+        </div>
+      </div>
+
+      <!-- Mode Switcher & Navigation Controls -->
+      <div class="flex items-center gap-2">
+        <button id="view-survey-btn" onclick="switchView('survey')" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-hku-blue text-white shadow transition flex items-center gap-1.5 border border-blue-400/30">
+          <i data-lucide="clipboard-list" class="w-3.5 h-3.5"></i> 填寫問卷
+        </button>
+        <button id="view-dashboard-btn" onclick="switchView('dashboard')" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 transition flex items-center gap-1.5 border border-slate-700">
+          <i data-lucide="bar-chart-3" class="w-3.5 h-3.5"></i> 數據統計 Dashboard
+          <span id="response-count-badge" class="ml-1 px-1.5 py-0.5 bg-hku-gold text-hku-navy font-bold text-[10px] rounded-full">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Progress Bar Container (Only shown in Survey Mode) -->
+  <div id="survey-progress-container" class="w-full bg-slate-200 h-2 sticky top-[64px] z-30 shadow-inner">
+    <div id="progress-bar" class="bg-gradient-to-r from-hku-blue to-hku-gold h-2 transition-all duration-300 ease-out" style="width: 14.28%;"></div>
+  </div>
+
+  <!-- ================= MAIN CONTAINER: SURVEY VIEW ================= -->
+  <main id="survey-view" class="max-w-4xl mx-auto w-full px-4 py-6 md:py-8 flex-grow">
+    
+    <!-- Step Badge and Tabs Navigation -->
+    <div class="flex items-center justify-between mb-4">
+      <div class="text-xs font-semibold text-slate-600 bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm">
+        目前進度：第 <span id="current-step-num" class="text-hku-blue font-bold">1</span> / 7 部分
+      </div>
+    </div>
+
+    <!-- Step Navigation Tabs (Desktop view) -->
+    <nav class="hidden md:flex justify-between items-center mb-6 bg-white p-2 rounded-xl shadow-sm border border-slate-200 text-xs font-medium text-slate-500">
+      <div class="step-tab font-semibold text-hku-blue flex items-center gap-1" data-step="1"><span class="w-5 h-5 rounded-full bg-hku-blue text-white flex items-center justify-center text-[10px]">1</span>同意書</div>
+      <div class="w-3 h-[1px] bg-slate-200"></div>
+      <div class="step-tab flex items-center gap-1" data-step="2"><span class="w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px]">2</span>背景</div>
+      <div class="w-3 h-[1px] bg-slate-200"></div>
+      <div class="step-tab flex items-center gap-1" data-step="3"><span class="w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px]">3</span>聆聽評估</div>
+      <div class="w-3 h-[1px] bg-slate-200"></div>
+      <div class="step-tab flex items-center gap-1" data-step="4"><span class="w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px]">4</span>版本比較</div>
+      <div class="w-3 h-[1px] bg-slate-200"></div>
+      <div class="step-tab flex items-center gap-1" data-step="5"><span class="w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px]">5</span>歌詞辨認</div>
+      <div class="w-3 h-[1px] bg-slate-200"></div>
+      <div class="step-tab flex items-center gap-1" data-step="6"><span class="w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px]">6</span>看法</div>
+      <div class="w-3 h-[1px] bg-slate-200"></div>
+      <div class="step-tab flex items-center gap-1" data-step="7"><span class="w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px]">7</span>開放問題</div>
+    </nav>
+
+    <!-- Error Alert Banner -->
+    <div id="error-banner" class="hidden mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-lg text-red-700 text-sm flex items-center gap-3 shadow-sm">
+      <i data-lucide="alert-circle" class="w-5 h-5 flex-shrink-0"></i>
+      <span id="error-message">請填妥本頁所有必要項目後再繼續。</span>
+    </div>
+
+    <!-- Questionnaire Container Form -->
+    <form id="questionnaire-form" onsubmit="return false;" class="space-y-6">
+
+      <!-- ================= STEP 1: CONSENT FORM ================= -->
+      <section id="step-1" class="step-content space-y-6">
+        <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200">
+          <div class="border-b border-slate-100 pb-4 mb-6">
+            <span class="text-xs font-bold text-hku-blue uppercase tracking-wider">Part I</span>
+            <h2 class="text-xl md:text-2xl font-bold text-hku-navy mt-1">第一部分：研究同意書 (Consent Form)</h2>
+          </div>
+
+          <div class="prose max-w-none text-slate-700 space-y-4 text-sm md:text-base leading-relaxed bg-slate-50 p-5 rounded-xl border border-slate-200/80">
+            <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+              <i data-lucide="book-open-check" class="w-5 h-5 text-hku-blue"></i> 研究說明
+            </h3>
+            <p>我們是香港大學言語治療學生，現正為 <strong>CEDU9001</strong> 進行一項學術研究。</p>
+            <p>本研究旨在探討粵語流行曲中的聲調與旋律配合（Tone-Melody Alignment），以及其對聽眾理解、辨認及整體聆聽體驗的影響。</p>
+            <ul class="list-disc pl-5 space-y-1 text-slate-600">
+              <li>本問卷約需 <strong>5–10 分鐘</strong> 完成。</li>
+              <li>所有資料將以<strong>完全匿名</strong>形式處理，並只作學術研究用途。</li>
+              <li>參與本研究屬自願性質，閣下可於任何時間退出而毋須提供任何理由。</li>
+            </ul>
+          </div>
+
+          <div class="mt-8 pt-4 border-t border-slate-100">
+            <label for="consent-check" class="flex items-start gap-3 cursor-pointer group p-3 rounded-lg hover:bg-slate-50 transition">
+              <input type="checkbox" id="consent-check" name="consent" class="mt-1 w-5 h-5 text-hku-blue rounded border-slate-300 focus:ring-hku-blue transition cursor-pointer">
+              <span class="text-slate-800 text-sm md:text-base font-medium group-hover:text-hku-navy">
+                本人已閱讀以上資料，明白本研究目的，並同意參與本研究。 <span class="text-red-500">*</span>
+              </span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= STEP 2: BACKGROUND ================= -->
+      <section id="step-2" class="step-content hidden space-y-6">
+        <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200">
+          <div class="border-b border-slate-100 pb-4 mb-6">
+            <span class="text-xs font-bold text-hku-blue uppercase tracking-wider">Part II</span>
+            <h2 class="text-xl md:text-2xl font-bold text-hku-navy mt-1">第二部分：參與者背景資料 (Participant Background)</h2>
+          </div>
+
+          <div class="space-y-6">
+            <!-- Q1: Age -->
+            <div class="q-block">
+              <label class="block font-semibold text-slate-800 mb-2">1. 年齡 <span class="text-red-500">*</span></label>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div>
+                  <input type="radio" id="age-1" name="age" value="18-20" class="hidden choice-pill-input">
+                  <label for="age-1" class="block w-full text-center py-2.5 px-4 rounded-xl border border-slate-200 hover:border-hku-blue cursor-pointer text-sm font-medium transition">18–20歲</label>
+                </div>
+                <div>
+                  <input type="radio" id="age-2" name="age" value="21-25" class="hidden choice-pill-input">
+                  <label for="age-2" class="block w-full text-center py-2.5 px-4 rounded-xl border border-slate-200 hover:border-hku-blue cursor-pointer text-sm font-medium transition">21–25歲</label>
+                </div>
+                <div>
+                  <input type="radio" id="age-3" name="age" value="26-30" class="hidden choice-pill-input">
+                  <label for="age-3" class="block w-full text-center py-2.5 px-4 rounded-xl border border-slate-200 hover:border-hku-blue cursor-pointer text-sm font-medium transition">26–30歲</label>
+                </div>
+                <div>
+                  <input type="radio" id="age-4" name="age" value="31+" class="hidden choice-pill-input">
+                  <label for="age-4" class="block w-full text-center py-2.5 px-4 rounded-xl border border-slate-200 hover:border-hku-blue cursor-pointer text-sm font-medium transition">31歲或以上</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Q2: Gender -->
+            <div class="q-block">
+              <label class="block font-semibold text-slate-800 mb-2">2. 性別 <span class="text-red-500">*</span></label>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div>
+                  <input type="radio" id="gender-1" name="gender" value="男" class="hidden choice-pill-input">
+                  <label for="gender-1" class="block w-full text-center py-2.5 px-4 rounded-xl border border-slate-200 hover:border-hku-blue cursor-pointer text-sm font-medium transition">男</label>
+                </div>
+                <div>
+                  <input type="radio" id="gender-2" name="gender" value="女" class="hidden choice-pill-input">
+                  <label for="gender-2" class="block w-full text-center py-2.5 px-4 rounded-xl border border-slate-200 hover:border-hku-blue cursor-pointer text-sm font-medium transition">女</label>
+                </div>
+                <div>
+                  <input type="radio" id="gender-3" name="gender" value="不願透露" class="hidden choice-pill-input">
+                  <label for="gender-3" class="block w-full text-center py-2.5 px-4 rounded-xl border border-slate-200 hover:border-hku-blue cursor-pointer text-sm font-medium transition">不願透露</label>
+                </div>
+                <div>
+                  <input type="radio" id="gender-4" name="gender" value="其他" class="hidden choice-pill-input">
+                  <label for="gender-4" class="block w-full text-center py-2.5 px-4 rounded-xl border border-slate-200 hover:border-hku-blue cursor-pointer text-sm font-medium transition">其他</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Q3: Native Language -->
+            <div class="q-block">
+              <label class="block font-semibold text-slate-800 mb-2">3. 母語 <span class="text-red-500">*</span></label>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div>
+                  <input type="radio" id="lang-1" name="native_language" value="粵語" class="hidden choice-pill-input">
+                  <label for="lang-1" class="block w-full text-center py-2.5 px-4 rounded-xl border border-slate-200 hover:border-hku-blue cursor-pointer text-sm font-medium transition">粵語</label>
+                </div>
+                <div>
+                  <input type="radio" id="lang-2" name="native_language" value="普通話" class="hidden choice-pill-input">
+                  <label for="lang-2" class="block w-full text-center py-2.5 px-4 rounded-xl border border-slate-200 hover:border-hku-blue cursor-pointer text-sm font-medium transition">普通話</label>
+                </div>
+                <div>
+                  <input type="radio" id="lang-3" name="native_language" value="英語" class="hidden choice-pill-input">
+                  <label for="lang-3" class="block w-full text-center py-2.5 px-4 rounded-xl border border-slate-200 hover:border-hku-blue cursor-pointer text-sm font-medium transition">英語</label>
+                </div>
+                <div>
+                  <input type="radio" id="lang-4" name="native_language" value="其他" class="hidden choice-pill-input">
+                  <label for="lang-4" class="block w-full text-center py-2.5 px-4 rounded-xl border border-slate-200 hover:border-hku-blue cursor-pointer text-sm font-medium transition">其他</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Q4: Cantonese Proficiency -->
+            <div class="q-block">
+              <label class="block font-semibold text-slate-800 mb-2">4. 你認為自己的粵語水平：<span class="text-red-500">*</span></label>
+              <div class="flex justify-between text-xs text-slate-500 mb-2 px-1">
+                <span>1 (非常差)</span>
+                <span>7 (母語水平)</span>
+              </div>
+              <div class="grid grid-cols-7 gap-1.5 md:gap-3">
+                <div class="flex-1 text-center"><input type="radio" id="prof-1" name="cantonese_proficiency" value="1" class="hidden scale-rating-input"><label for="prof-1" class="block py-3 rounded-xl border border-slate-200 cursor-pointer text-sm font-semibold transition">1</label></div>
+                <div class="flex-1 text-center"><input type="radio" id="prof-2" name="cantonese_proficiency" value="2" class="hidden scale-rating-input"><label for="prof-2" class="block py-3 rounded-xl border border-slate-200 cursor-pointer text-sm font-semibold transition">2</label></div>
+                <div class="flex-1 text-center"><input type="radio" id="prof-3" name="cantonese_proficiency" value="3" class="hidden scale-rating-input"><label for="prof-3" class="block py-3 rounded-xl border border-slate-200 cursor-pointer text-sm font-semibold transition">3</label></div>
+                <div class="flex-1 text-center"><input type="radio" id="prof-4" name="cantonese_proficiency" value="4" class="hidden scale-rating-input"><label for="prof-4" class="block py-3 rounded-xl border border-slate-200 cursor-pointer text-sm font-semibold transition">4</label></div>
+                <div class="flex-1 text-center"><input type="radio" id="prof-5" name="cantonese_proficiency" value="5" class="hidden scale-rating-input"><label for="prof-5" class="block py-3 rounded-xl border border-slate-200 cursor-pointer text-sm font-semibold transition">5</label></div>
+                <div class="flex-1 text-center"><input type="radio" id="prof-6" name="cantonese_proficiency" value="6" class="hidden scale-rating-input"><label for="prof-6" class="block py-3 rounded-xl border border-slate-200 cursor-pointer text-sm font-semibold transition">6</label></div>
+                <div class="flex-1 text-center"><input type="radio" id="prof-7" name="cantonese_proficiency" value="7" class="hidden scale-rating-input"><label for="prof-7" class="block py-3 rounded-xl border border-slate-200 cursor-pointer text-sm font-semibold transition">7</label></div>
+              </div>
+            </div>
+
+            <!-- Q5: Listening Frequency -->
+            <div class="q-block">
+              <label class="block font-semibold text-slate-800 mb-2">5. 你平均每星期收聽粵語流行曲的頻率：<span class="text-red-500">*</span></label>
+              <div class="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                <div>
+                  <input type="radio" id="freq-1" name="listen_frequency" value="幾乎不聽" class="hidden choice-pill-input">
+                  <label for="freq-1" class="block w-full text-center py-2.5 px-3 rounded-xl border border-slate-200 hover:border-hku-blue cursor-pointer text-xs md:text-sm font-medium transition">幾乎不聽</label>
+                </div>
+                <div>
+                  <input type="radio" id="freq-2" name="listen_frequency" value="每月數次" class="hidden choice-pill-input">
+                  <label for="freq-2" class="block w-full text-center py-2.5 px-3 rounded-xl border border-slate-200 hover:border-hku-blue cursor-pointer text-xs md:text-sm font-medium transition">每月數次</label>
+                </div>
+                <div>
+                  <input type="radio" id="freq-3" name="listen_frequency" value="每週1–3次" class="hidden choice-pill-input">
+                  <label for="freq-3" class="block w-full text-center py-2.5 px-3 rounded-xl border border-slate-200 hover:border-hku-blue cursor-pointer text-xs md:text-sm font-medium transition">每週1–3次</label>
+                </div>
+                <div>
+                  <input type="radio" id="freq-4" name="listen_frequency" value="每週4–6次" class="hidden choice-pill-input">
+                  <label for="freq-4" class="block w-full text-center py-2.5 px-3 rounded-xl border border-slate-200 hover:border-hku-blue cursor-pointer text-xs md:text-sm font-medium transition">每週4–6次</label>
+                </div>
+                <div>
+                  <input type="radio" id="freq-5" name="listen_frequency" value="每日收聽" class="hidden choice-pill-input">
+                  <label for="freq-5" class="block w-full text-center py-2.5 px-3 rounded-xl border border-slate-200 hover:border-hku-blue cursor-pointer text-xs md:text-sm font-medium transition">每日收聽</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Q6: Music Training -->
+            <div class="q-block">
+              <label class="block font-semibold text-slate-800 mb-2">6. 你曾否接受正式音樂訓練？<span class="text-red-500">*</span></label>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div>
+                  <input type="radio" id="music-1" name="music_training" value="沒有" class="hidden choice-pill-input">
+                  <label for="music-1" class="block w-full text-center py-2.5 px-4 rounded-xl border border-slate-200 hover:border-hku-blue cursor-pointer text-sm font-medium transition">沒有</label>
+                </div>
+                <div>
+                  <input type="radio" id="music-2" name="music_training" value="1–3年" class="hidden choice-pill-input">
+                  <label for="music-2" class="block w-full text-center py-2.5 px-4 rounded-xl border border-slate-200 hover:border-hku-blue cursor-pointer text-sm font-medium transition">1–3年</label>
+                </div>
+                <div>
+                  <input type="radio" id="music-3" name="music_training" value="4–6年" class="hidden choice-pill-input">
+                  <label for="music-3" class="block w-full text-center py-2.5 px-4 rounded-xl border border-slate-200 hover:border-hku-blue cursor-pointer text-sm font-medium transition">4–6年</label>
+                </div>
+                <div>
+                  <input type="radio" id="music-4" name="music_training" value="7年或以上" class="hidden choice-pill-input">
+                  <label for="music-4" class="block w-full text-center py-2.5 px-4 rounded-xl border border-slate-200 hover:border-hku-blue cursor-pointer text-sm font-medium transition">7年或以上</label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Q7: Sheet Music -->
+            <div class="q-block">
+              <label class="block font-semibold text-slate-800 mb-2">7. 你是否懂得閱讀樂譜？<span class="text-red-500">*</span></label>
+              <div class="grid grid-cols-2 gap-3 max-w-xs">
+                <div>
+                  <input type="radio" id="sheet-1" name="sheet_music" value="是" class="hidden choice-pill-input">
+                  <label for="sheet-1" class="block w-full text-center py-2.5 px-4 rounded-xl border border-slate-200 hover:border-hku-blue cursor-pointer text-sm font-medium transition">是</label>
+                </div>
+                <div>
+                  <input type="radio" id="sheet-2" name="sheet_music" value="否" class="hidden choice-pill-input">
+                  <label for="sheet-2" class="block w-full text-center py-2.5 px-4 rounded-xl border border-slate-200 hover:border-hku-blue cursor-pointer text-sm font-medium transition">否</label>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= STEP 3: LISTENING EVALUATION ================= -->
+      <section id="step-3" class="step-content hidden space-y-6">
+        <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200">
+          <div class="border-b border-slate-100 pb-4 mb-6">
+            <span class="text-xs font-bold text-hku-blue uppercase tracking-wider">Part III</span>
+            <h2 class="text-xl md:text-2xl font-bold text-hku-navy mt-1">第三部分：聆聽評估 (Listening Task)</h2>
+          </div>
+
+          <div class="bg-blue-50/80 border border-blue-200 rounded-xl p-4 mb-6 text-slate-700 text-sm flex items-start gap-3">
+            <i data-lucide="headphones" class="w-6 h-6 text-hku-blue flex-shrink-0 mt-0.5"></i>
+            <div>
+              <h4 class="font-bold text-hku-navy mb-1">指示</h4>
+              <p>1. 請佩戴耳機。點擊「播放音訊」按鈕收聽歌曲錄音。</p>
+              <p>2. 每段錄音可點擊播放收聽。請根據你的第一印象回答問題。</p>
+            </div>
+          </div>
+
+          <!-- Dynamic Audio Items Container -->
+          <div id="listening-items-container" class="space-y-8">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= STEP 4: FORCED-CHOICE COMPARISON ================= -->
+      <section id="step-4" class="step-content hidden space-y-6">
+        <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200">
+          <div class="border-b border-slate-100 pb-4 mb-6">
+            <span class="text-xs font-bold text-hku-blue uppercase tracking-wider">Part IV</span>
+            <h2 class="text-xl md:text-2xl font-bold text-hku-navy mt-1">第四部分：版本比較 (Forced-Choice Comparison)</h2>
+          </div>
+
+          <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 text-amber-900 text-sm flex items-start gap-3">
+            <i data-lucide="sparkles" class="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5"></i>
+            <div>
+              <h4 class="font-bold mb-1">指示</h4>
+              <p>你將會聽到兩個版本（版本 A 與 版本 B），兩者僅在旋律或協調度設定上有所不同。請選擇你認為較佳的版本。</p>
+            </div>
+          </div>
+
+          <div id="comparison-items-container" class="space-y-8">
+            <!-- Dynamic comparison items -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= STEP 5: LYRIC RECOGNITION ================= -->
+      <section id="step-5" class="step-content hidden space-y-6">
+        <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200">
+          <div class="border-b border-slate-100 pb-4 mb-6">
+            <span class="text-xs font-bold text-hku-blue uppercase tracking-wider">Part V</span>
+            <h2 class="text-xl md:text-2xl font-bold text-hku-navy mt-1">第五部分：歌詞辨認測驗 (Lyric Recognition Task)</h2>
+          </div>
+
+          <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-4 mb-6 text-indigo-950 text-sm">
+            <p class="font-semibold text-indigo-900 mb-1">重點核心測試：</p>
+            <p class="text-xs text-indigo-800">本部分測試聲調與旋律不配合（Tone-Melody Mismatch）是否直接影響歌詞辨認與理解。請播放錄音並選出你所聽到的歌詞。</p>
+          </div>
+
+          <div id="lyric-items-container" class="space-y-8">
+            <!-- Dynamic Lyric Recognition Items -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= STEP 6: ATTITUDES TOWARD LYRICS ================= -->
+      <section id="step-6" class="step-content hidden space-y-6">
+        <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200">
+          <div class="border-b border-slate-100 pb-4 mb-6">
+            <span class="text-xs font-bold text-hku-blue uppercase tracking-wider">Part VI</span>
+            <h2 class="text-xl md:text-2xl font-bold text-hku-navy mt-1">第六部分：對歌詞的看法 (Attitudes Toward Lyrics)</h2>
+          </div>
+
+          <div class="text-xs text-slate-500 bg-slate-50 p-3 rounded-lg mb-6 flex justify-between items-center">
+            <span>請根據陳述選擇同意程度：</span>
+            <span class="font-semibold text-slate-700">1 = 非常不同意 &nbsp;|&nbsp; 7 = 非常同意</span>
+          </div>
+
+          <div id="attitude-statements-container" class="space-y-6">
+            <!-- Dynamic attitude questions -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= STEP 7: OPEN-ENDED QUESTIONS ================= -->
+      <section id="step-7" class="step-content hidden space-y-6">
+        <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200">
+          <div class="border-b border-slate-100 pb-4 mb-6">
+            <span class="text-xs font-bold text-hku-blue uppercase tracking-wider">Part VII</span>
+            <h2 class="text-xl md:text-2xl font-bold text-hku-navy mt-1">第七部分：開放式問題 (Open-ended Questions)</h2>
+          </div>
+
+          <div class="space-y-6">
+            <div class="q-block">
+              <label for="open-q1" class="block font-semibold text-slate-800 mb-2">1. 你認為一首自然的粵語流行曲應具備什麼特點？ <span class="text-red-500">*</span></label>
+              <textarea id="open-q1" name="open_q1" rows="3" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-hku-blue focus:border-hku-blue outline-none text-sm transition" placeholder="請填寫你的看法..."></textarea>
+            </div>
+
+            <div class="q-block">
+              <label for="open-q2" class="block font-semibold text-slate-800 mb-2">2. 在剛才的錄音中，你有否留意到任何不自然的地方？如有，請簡單說明。 <span class="text-red-500">*</span></label>
+              <textarea id="open-q2" name="open_q2" rows="3" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-hku-blue focus:border-hku-blue outline-none text-sm transition" placeholder="例如哪一段音訊、哪個字的發音或聲調感到特別奇怪..."></textarea>
+            </div>
+
+            <div class="q-block">
+              <label class="block font-semibold text-slate-800 mb-2">3. 你認為歌曲創作時應優先考慮： <span class="text-red-500">*</span></label>
+              <div class="space-y-2 mb-4">
+                <div>
+                  <input type="radio" id="priority-1" name="creation_priority" value="歌詞聲調" class="hidden choice-pill-input">
+                  <label for="priority-1" class="block w-full py-2.5 px-4 rounded-xl border border-slate-200 hover:border-hku-blue cursor-pointer text-sm font-medium transition">歌詞聲調</label>
+                </div>
+                <div>
+                  <input type="radio" id="priority-2" name="creation_priority" value="音樂旋律" class="hidden choice-pill-input">
+                  <label for="priority-2" class="block w-full py-2.5 px-4 rounded-xl border border-slate-200 hover:border-hku-blue cursor-pointer text-sm font-medium transition">音樂旋律</label>
+                </div>
+                <div>
+                  <input type="radio" id="priority-3" name="creation_priority" value="兩者同樣重要" class="hidden choice-pill-input">
+                  <label for="priority-3" class="block w-full py-2.5 px-4 rounded-xl border border-slate-200 hover:border-hku-blue cursor-pointer text-sm font-medium transition">兩者同樣重要</label>
+                </div>
+              </div>
+              <label for="priority-reason" class="block text-xs font-semibold text-slate-600 mb-1">請簡述原因： <span class="text-red-500">*</span></label>
+              <textarea id="priority-reason" name="priority_reason" rows="2" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-hku-blue focus:border-hku-blue outline-none text-sm transition" placeholder="簡述原因..."></textarea>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= COMPLETION STEP ================= -->
+      <section id="step-completion" class="step-content hidden space-y-6">
+        <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 text-center space-y-6">
+          <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto">
+            <i data-lucide="check-circle-2" class="w-10 h-10"></i>
+          </div>
+          <h2 class="text-2xl font-bold text-hku-navy">問卷已成功提交！</h2>
+          <p class="text-slate-600 text-sm max-w-md mx-auto">
+            非常感謝閣下參與本次《粵語流行曲中的聲調與旋律配合》研究。你的資料將為 CEDU9001 提供寶貴的學術數據。
+          </p>
+
+          <div class="flex flex-wrap gap-3 justify-center pt-2">
+            <button type="button" onclick="switchView('dashboard')" class="px-5 py-2.5 bg-hku-blue text-white text-xs font-semibold rounded-xl hover:bg-blue-700 transition flex items-center gap-2 shadow">
+              <i data-lucide="bar-chart-3" class="w-4 h-4"></i> 前往查看即時研究數據 Dashboard
+            </button>
+            <button type="button" onclick="resetFormForNewResponse()" class="px-5 py-2.5 border border-slate-300 text-slate-700 text-xs font-semibold rounded-xl hover:bg-slate-100 transition flex items-center gap-1">
+              <i data-lucide="plus-circle" class="w-4 h-4"></i> 填寫另一份問卷
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Navigation Footer -->
+      <div id="nav-buttons-bar" class="flex justify-between items-center pt-4 border-t border-slate-200">
+        <button type="button" id="prev-btn" onclick="prevStep()" class="hidden px-5 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-xl text-sm font-semibold hover:bg-slate-50 transition flex items-center gap-2 shadow-sm">
+          <i data-lucide="chevron-left" class="w-4 h-4"></i> 上一步
+        </button>
+        <div class="flex-grow"></div>
+        <button type="button" id="next-btn" onclick="nextStep()" class="px-6 py-2.5 bg-hku-blue text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition flex items-center gap-2 shadow-md hover:shadow-lg">
+          下一頁 <i data-lucide="chevron-right" class="w-4 h-4"></i>
+        </button>
+        <button type="button" id="submit-btn" onclick="submitForm()" class="hidden px-6 py-2.5 bg-emerald-600 text-white rounded-xl text-sm font-semibold hover:bg-emerald-700 transition flex items-center gap-2 shadow-md hover:shadow-lg">
+          提交問卷 <i data-lucide="send" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+    </form>
+  </main>
+
+  <!-- ================= MAIN CONTAINER: DATA & STATISTICS DASHBOARD ================= -->
+  <main id="dashboard-view" class="hidden max-w-7xl mx-auto w-full px-4 py-6 md:py-8 flex-grow space-y-6">
+    
+    <!-- Dashboard Top Bar -->
+    <div class="flex flex-wrap items-center justify-between gap-4 bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="px-2.5 py-0.5 bg-hku-gold/20 text-hku-navy text-xs font-bold rounded-md">CEDU9001 Admin</span>
+          <h2 class="text-xl font-bold text-hku-navy">研究數據與統計分析 Dashboard</h2>
+        </div>
+        <p class="text-xs text-slate-500 mt-1">《粵語流行曲中的聲調與旋律配合》即時收集數據、視覺化圖表與文本分析</p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <button onclick="generateMockData()" class="px-3.5 py-2 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-xl text-xs font-semibold hover:bg-indigo-100 transition flex items-center gap-1.5">
+          <i data-lucide="sparkles" class="w-4 h-4 text-indigo-600"></i> 生成 15 筆測試數據
+        </button>
+        <button onclick="exportCSVData()" class="px-3.5 py-2 bg-emerald-600 text-white rounded-xl text-xs font-semibold hover:bg-emerald-700 transition flex items-center gap-1.5 shadow">
+          <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> 匯出 Raw Data (CSV)
+        </button>
+        <button onclick="exportJSONData()" class="px-3.5 py-2 bg-hku-navy text-white rounded-xl text-xs font-semibold hover:bg-slate-800 transition flex items-center gap-1.5 shadow">
+          <i data-lucide="download" class="w-4 h-4"></i> 匯出 JSON
+        </button>
+        <button onclick="clearAllData()" class="px-3 py-2 border border-red-200 text-red-600 rounded-xl text-xs font-semibold hover:bg-red-50 transition flex items-center gap-1">
+          <i data-lucide="trash-2" class="w-4 h-4"></i> 清空數據
+        </button>
+      </div>
+    </div>
+
+    <!-- Summary Overview Metric Cards -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+        <div class="w-12 h-12 bg-blue-50 text-hku-blue rounded-xl flex items-center justify-center font-bold">
+          <i data-lucide="users" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <p class="text-xs text-slate-500 font-medium">已收集問卷總數</p>
+          <p id="stat-total-responses" class="text-2xl font-bold text-slate-900">0</p>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+        <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center font-bold">
+          <i data-lucide="mic" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <p class="text-xs text-slate-500 font-medium">平均粵語能力評分</p>
+          <p id="stat-avg-prof" class="text-2xl font-bold text-slate-900">0.0 / 7</p>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+        <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center font-bold">
+          <i data-lucide="check-check" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <p class="text-xs text-slate-500 font-medium">歌詞辨認整體正確率</p>
+          <p id="stat-lyric-accuracy" class="text-2xl font-bold text-slate-900">0%</p>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+        <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center font-bold">
+          <i data-lucide="music" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <p class="text-xs text-slate-500 font-medium">具音樂訓練比例</p>
+          <p id="stat-music-ratio" class="text-2xl font-bold text-slate-900">0%</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Analytics Charts Section 1: Demographics -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <h3 class="font-bold text-slate-800 text-sm mb-4 flex items-center gap-2">
+          <i data-lucide="pie-chart" class="w-4 h-4 text-hku-blue"></i> 年齡分佈 (Age Distribution)
+        </h3>
+        <div class="h-48 relative">
+          <canvas id="chart-age"></canvas>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <h3 class="font-bold text-slate-800 text-sm mb-4 flex items-center gap-2">
+          <i data-lucide="globe" class="w-4 h-4 text-hku-blue"></i> 參與者母語 (Native Language)
+        </h3>
+        <div class="h-48 relative">
+          <canvas id="chart-language"></canvas>
+        </div>
+      </div>
+
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <h3 class="font-bold text-slate-800 text-sm mb-4 flex items-center gap-2">
+          <i data-lucide="award" class="w-4 h-4 text-hku-blue"></i> 音樂訓練年資 (Music Training)
+        </h3>
+        <div class="h-48 relative">
+          <canvas id="chart-music"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Analytics Section 2: Core Research Findings (Match vs Mismatch Rating Comparison) -->
+    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+      <div class="flex flex-wrap justify-between items-center border-b border-slate-100 pb-3">
+        <div>
+          <h3 class="font-bold text-hku-navy text-base flex items-center gap-2">
+            <i data-lucide="git-compare" class="w-5 h-5 text-hku-blue"></i> 第三部分：Tone-Melody Match vs Mismatch 評分比較
+          </h3>
+          <p class="text-xs text-slate-500">比較「聲調配合 Match (Audio 1,3,5)」與「聲調不配合 Mismatch (Audio 2,4,6)」在 1–7 Likert 量表上的平均分數</p>
+        </div>
+      </div>
+      
+      <div class="h-64 relative">
+        <canvas id="chart-match-mismatch"></canvas>
+      </div>
+    </div>
+
+    <!-- Analytics Section 3: Forced Choice & Lyric Recognition -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      
+      <!-- Forced Choice Comparison chart -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+        <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+          <i data-lucide="split" class="w-4 h-4 text-hku-blue"></i> 第四部分：版本偏好比例 (Forced-Choice Comparison)
+        </h3>
+        <p class="text-xs text-slate-500">參與者在版本 A 與版本 B 之間的選擇率</p>
+        <div class="h-56 relative">
+          <canvas id="chart-comparison"></canvas>
+        </div>
+      </div>
+
+      <!-- Lyric Recognition Accuracy chart -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+        <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
+          <i data-lucide="target" class="w-4 h-4 text-hku-blue"></i> 第五部分：歌詞辨認正確率比較
+        </h3>
+        <p class="text-xs text-slate-500">聲調配合 (Match) 與 聲調偏離 (Mismatch) 情況下的正確辨認率 (%)</p>
+        <div class="h-56 relative">
+          <canvas id="chart-lyric-match"></canvas>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Analytics Section 4: Attitude Ratings (Part VI) -->
+    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+      <h3 class="font-bold text-hku-navy text-base flex items-center gap-2">
+        <i data-lucide="sliders" class="w-5 h-5 text-hku-blue"></i> 第六部分：對粵語歌詞與聲調的態度 (Mean Likert Scores)
+      </h3>
+      <div class="h-60 relative">
+        <canvas id="chart-attitudes"></canvas>
+      </div>
+    </div>
+
+    <!-- Analytics Section 5: Qualitative Open-ended Feedback Table -->
+    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+      <div class="flex flex-wrap justify-between items-center gap-3 border-b border-slate-100 pb-4">
+        <div>
+          <h3 class="font-bold text-hku-navy text-base flex items-center gap-2">
+            <i data-lucide="message-square-text" class="w-5 h-5 text-hku-blue"></i> 第七部分：開放式定性意見列表
+          </h3>
+          <p class="text-xs text-slate-500">檢視參與者對粵語歌曲特點、不自然之處及創作優先考量的填寫內容</p>
+        </div>
+        <input type="text" id="feedback-search" oninput="filterQualitativeTable()" placeholder="搜尋關鍵字..." class="px-3 py-1.5 border border-slate-300 rounded-lg text-xs w-48 focus:outline-none focus:ring-2 focus:ring-hku-blue">
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-xs text-left text-slate-700">
+          <thead class="bg-slate-50 text-slate-700 uppercase text-[10px] tracking-wider border-b border-slate-200">
+            <tr>
+              <th class="px-4 py-3">#</th>
+              <th class="px-4 py-3">背景</th>
+              <th class="px-4 py-3">自然粵語歌曲特點</th>
+              <th class="px-4 py-3">留意到的不自然之處</th>
+              <th class="px-4 py-3">創作優先考量</th>
+              <th class="px-4 py-3">理由說明</th>
+            </tr>
+          </thead>
+          <tbody id="qualitative-table-body" class="divide-y divide-slate-100">
+            <tr>
+              <td colspan="6" class="px-4 py-6 text-center text-slate-400">尚無問卷提交數據。點擊上方「生成 15 筆測試數據」以進行測試。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer Info -->
+  <footer class="bg-white border-t border-slate-200 text-slate-500 text-xs py-4 text-center">
+    <div class="max-w-6xl mx-auto px-4">
+      <p>© 2026 香港大學 Speech and Hearing Sciences - CEDU9001 研究小組</p>
+      <p class="mt-1 text-slate-400">本問卷與數據儀表板系統提供完整學術收集與即時數據分析功能</p>
+    </div>
+  </footer>
+
+  <!-- Web Audio API Synthesizer Script -->
+  <script>
+    class CantoneseAudioSynth {
+      constructor() {
+        this.ctx = null;
+      }
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+        }
+      }
+      playSnippet(isMatch = true, duration = 2.5, btn = null) {
+        this.init();
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+
+        if (btn) {
+          btn.disabled = true;
+          btn.classList.add('opacity-75');
+          const origText = btn.innerHTML;
+          btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i> 播放中...`;
+          lucide.createIcons();
+          setTimeout(() => {
+            btn.disabled = false;
+            btn.classList.remove('opacity-75');
+            btn.innerHTML = origText;
+            lucide.createIcons();
+          }, duration * 1000);
+        }
+
+        const now = this.ctx.currentTime;
+        let freqs = [261.63, 293.66, 329.63, 392.00, 440.00]; 
+        if (!isMatch) {
+          freqs = [261.63, 311.13, 349.23, 415.30, 466.16]; 
+        }
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = 'triangle';
+        const step = duration / freqs.length;
+        freqs.forEach((f, idx) => {
+          osc.frequency.setValueAtTime(f, now + idx * step);
+        });
+
+        gain.gain.setValueAtTime(0.01, now);
+        gain.gain.linearRampToValueAtTime(0.35, now + 0.1);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + duration);
+      }
+    }
+
+    const synth = new CantoneseAudioSynth();
+
+    // Listening Tasks Data
+    const listeningTasks = [
+      { id: 1, label: "音訊 1", tag: "Tone-Melody Match", isMatch: true },
+      { id: 2, label: "音訊 2", tag: "Tone-Melody Mismatch", isMatch: false },
+      { id: 3, label: "音訊 3", tag: "Tone-Melody Match", isMatch: true },
+      { id: 4, label: "音訊 4", tag: "Tone-Melody Mismatch", isMatch: false },
+      { id: 5, label: "音訊 5", tag: "Tone-Melody Match", isMatch: true },
+      { id: 6, label: "音訊 6", tag: "Tone-Melody Mismatch", isMatch: false }
+    ];
+
+    // Lyric Recognition Data
+    const lyricTasks = [
+      { id: 7, label: "音訊 7", options: ["風繼續吹", "東繼續吹", "通繼續吹", "空繼續吹"], correct: "風繼續吹", isMatch: false },
+      { id: 8, label: "音訊 8", options: ["讓愛同行", "讓你同行", "讓我同行", "讓夢同行"], correct: "讓愛同行", isMatch: true },
+      { id: 9, label: "音訊 9", options: ["歲月如歌", "碎月如歌", "睡月如歌", "隨月如歌"], correct: "歲月如歌", isMatch: false },
+      { id: 10, label: "音訊 10", options: ["傾城之戀", "城城之戀", "清城之戀", "驚城之戀"], correct: "傾城之戀", isMatch: true },
+      { id: 11, label: "音訊 11", options: ["光輝歲月", "廣輝歲月", "港輝歲月", "狂輝歲月"], correct: "光輝歲月", isMatch: false }
+    ];
+
+    // Attitude Questions Data
+    const attitudeStatements = [
+      { id: 1, text: "我平時聽歌時會留意歌詞內容。" },
+      { id: 2, text: "我認為粵語歌曲應盡量保留原有聲調。" },
+      { id: 3, text: "歌詞比旋律更重要。" },
+      { id: 4, text: "準確的粵語發音會提升歌曲質素。" },
+      { id: 5, text: "即使聲調改變，只要旋律好聽亦沒有問題。" },
+      { id: 6, text: "聲調與旋律不一致時，我會覺得不自然。" }
+    ];
+
+    // Data Storage Array
+    let responsesDatabase = JSON.parse(localStorage.getItem('hku_cantonese_responses') || '[]');
+
+    // Step state tracking variables
+    let currentStep = 1;
+    const totalSteps = 7;
+
+    // Render Part III dynamically
+    function renderListeningTasks() {
+      const container = document.getElementById('listening-items-container');
+      container.innerHTML = listeningTasks.map(task => `
+        <div class="border border-slate-200 rounded-2xl p-5 bg-slate-50/60 space-y-5">
+          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3">
+            <div class="flex items-center gap-3">
+              <span class="font-bold text-hku-navy text-lg">${task.label}</span>
+              <span class="text-[10px] font-semibold px-2.5 py-1 rounded-full ${task.isMatch ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+                ${task.tag}
+              </span>
+            </div>
+            <button type="button" onclick="synth.playSnippet(${task.isMatch}, 2.5, this)" class="px-4 py-2 bg-hku-blue text-white text-xs font-semibold rounded-xl hover:bg-blue-700 transition flex items-center gap-2 shadow">
+              <i data-lucide="play" class="w-4 h-4"></i> 播放音訊 (Audio Clip)
+            </button>
+          </div>
+
+          <div class="space-y-4">
+            <!-- Criterion 1 -->
+            <div>
+              <div class="flex justify-between text-xs font-semibold text-slate-700 mb-1.5">
+                <span>1. 這段歌曲聽起來自然嗎？</span>
+                <span class="text-slate-400">1 (非常不自然) → 7 (非常自然)</span>
+              </div>
+              <div class="grid grid-cols-7 gap-1 md:gap-2">
+                ${[1,2,3,4,5,6,7].map(num => `
+                  <div class="text-center">
+                    <input type="radio" id="audio-${task.id}-nat-${num}" name="audio_${task.id}_naturalness" value="${num}" class="hidden scale-rating-input">
+                    <label for="audio-${task.id}-nat-${num}" class="block py-2.5 rounded-lg border border-slate-200 cursor-pointer text-xs font-semibold transition">${num}</label>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+
+            <!-- Criterion 2 -->
+            <div>
+              <div class="flex justify-between text-xs font-semibold text-slate-700 mb-1.5">
+                <span>2. 歌詞與旋律配合程度如何？</span>
+                <span class="text-slate-400">1 (完全不配合) → 7 (非常配合)</span>
+              </div>
+              <div class="grid grid-cols-7 gap-1 md:gap-2">
+                ${[1,2,3,4,5,6,7].map(num => `
+                  <div class="text-center">
+                    <input type="radio" id="audio-${task.id}-fit-${num}" name="audio_${task.id}_fit" value="${num}" class="hidden scale-rating-input">
+                    <label for="audio-${task.id}-fit-${num}" class="block py-2.5 rounded-lg border border-slate-200 cursor-pointer text-xs font-semibold transition">${num}</label>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+
+            <!-- Criterion 3 -->
+            <div>
+              <div class="flex justify-between text-xs font-semibold text-slate-700 mb-1.5">
+                <span>3. 歌詞容易理解嗎？</span>
+                <span class="text-slate-400">1 (非常難理解) → 7 (非常容易理解)</span>
+              </div>
+              <div class="grid grid-cols-7 gap-1 md:gap-2">
+                ${[1,2,3,4,5,6,7].map(num => `
+                  <div class="text-center">
+                    <input type="radio" id="audio-${task.id}-und-${num}" name="audio_${task.id}_understanding" value="${num}" class="hidden scale-rating-input">
+                    <label for="audio-${task.id}-und-${num}" class="block py-2.5 rounded-lg border border-slate-200 cursor-pointer text-xs font-semibold transition">${num}</label>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+
+            <!-- Criterion 4 -->
+            <div>
+              <div class="flex justify-between text-xs font-semibold text-slate-700 mb-1.5">
+                <span>4. 歌手的粵語發音自然嗎？</span>
+                <span class="text-slate-400">1 (非常不自然) → 7 (非常自然)</span>
+              </div>
+              <div class="grid grid-cols-7 gap-1 md:gap-2">
+                ${[1,2,3,4,5,6,7].map(num => `
+                  <div class="text-center">
+                    <input type="radio" id="audio-${task.id}-pro-${num}" name="audio_${task.id}_pronunciation" value="${num}" class="hidden scale-rating-input">
+                    <label for="audio-${task.id}-pro-${num}" class="block py-2.5 rounded-lg border border-slate-200 cursor-pointer text-xs font-semibold transition">${num}</label>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Render Part IV
+    function renderComparisonTasks() {
+      const container = document.getElementById('comparison-items-container');
+      const questions = [
+        { key: "natural", label: "哪個版本較自然？" },
+        { key: "intelligible", label: "哪個版本較容易理解歌詞？" },
+        { key: "fit", label: "哪個版本的歌詞與旋律較配合？" },
+        { key: "professional", label: "哪個版本比較像專業粵語流行曲？" }
+      ];
+
+      container.innerHTML = `
+        <div class="border border-slate-200 rounded-2xl p-5 bg-slate-50/60 space-y-6">
+          <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-4">
+            <span class="font-bold text-hku-navy text-lg">Comparison 1</span>
+            <div class="flex items-center gap-3">
+              <button type="button" onclick="synth.playSnippet(true, 2.5, this)" class="px-4 py-2 bg-hku-navy text-white text-xs font-semibold rounded-xl hover:bg-slate-800 transition flex items-center gap-2">
+                <i data-lucide="play-circle" class="w-4 h-4 text-hku-gold"></i> 播放 Audio A (Match)
+              </button>
+              <button type="button" onclick="synth.playSnippet(false, 2.5, this)" class="px-4 py-2 bg-slate-700 text-white text-xs font-semibold rounded-xl hover:bg-slate-800 transition flex items-center gap-2">
+                <i data-lucide="play-circle" class="w-4 h-4 text-rose-400"></i> 播放 Audio B (Mismatch)
+              </button>
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            ${questions.map(q => `
+              <div class="q-block">
+                <label class="block font-semibold text-slate-800 text-xs md:text-sm mb-2">${q.label} <span class="text-red-500">*</span></label>
+                <div class="grid grid-cols-3 gap-3">
+                  <div>
+                    <input type="radio" id="comp-1-${q.key}-A" name="comp_1_${q.key}" value="A" class="hidden choice-pill-input">
+                    <label for="comp-1-${q.key}-A" class="block w-full text-center py-2 px-3 rounded-xl border border-slate-200 hover:border-hku-blue cursor-pointer text-xs font-semibold transition">版本 A</label>
+                  </div>
+                  <div>
+                    <input type="radio" id="comp-1-${q.key}-B" name="comp_1_${q.key}" value="B" class="hidden choice-pill-input">
+                    <label for="comp-1-${q.key}-B" class="block w-full text-center py-2 px-3 rounded-xl border border-slate-200 hover:border-hku-blue cursor-pointer text-xs font-semibold transition">版本 B</label>
+                  </div>
+                  <div>
+                    <input type="radio" id="comp-1-${q.key}-None" name="comp_1_${q.key}" value="沒有明顯差異" class="hidden choice-pill-input">
+                    <label for="comp-1-${q.key}-None" class="block w-full text-center py-2 px-3 rounded-xl border border-slate-200 hover:border-hku-blue cursor-pointer text-xs font-semibold transition">沒有明顯差異</label>
+                  </div>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    // Render Part V Lyric Recognition
+    function renderLyricTasks() {
+      const container = document.getElementById('lyric-items-container');
+      container.innerHTML = lyricTasks.map(task => `
+        <div class="border border-slate-200 rounded-2xl p-5 bg-slate-50/60 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+            <span class="font-bold text-hku-navy text-lg">${task.label}</span>
+            <button type="button" onclick="synth.playSnippet(${task.isMatch}, 2, this)" class="px-4 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-xl hover:bg-indigo-700 transition flex items-center gap-2 shadow">
+              <i data-lucide="volume-2" class="w-4 h-4"></i> 播放錄音
+            </button>
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-800 text-sm mb-3">請問你聽到以下哪一句歌詞？ <span class="text-red-500">*</span></label>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+              ${task.options.map((opt, idx) => `
+                <div>
+                  <input type="radio" id="lyric-${task.id}-opt-${idx}" name="lyric_${task.id}" value="${opt}" class="hidden choice-pill-input">
+                  <label for="lyric-${task.id}-opt-${idx}" class="block w-full text-center py-3 px-4 rounded-xl border border-slate-200 hover:border-hku-blue cursor-pointer text-sm font-semibold transition">${opt}</label>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Render Part VI Attitudes
+    function renderAttitudeTasks() {
+      const container = document.getElementById('attitude-statements-container');
+      container.innerHTML = attitudeStatements.map(st => `
+        <div class="border border-slate-200 rounded-xl p-4 bg-white space-y-3">
+          <label class="block font-semibold text-slate-800 text-sm">${st.text} <span class="text-red-500">*</span></label>
+          <div class="grid grid-cols-7 gap-1 md:gap-3">
+            ${[1,2,3,4,5,6,7].map(num => `
+              <div class="text-center">
+                <input type="radio" id="attitude-${st.id}-${num}" name="attitude_${st.id}" value="${num}" class="hidden scale-rating-input">
+                <label for="attitude-${st.id}-${num}" class="block py-2.5 rounded-xl border border-slate-200 cursor-pointer text-xs font-semibold transition">${num}</label>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Step Switch Control
+    function showStep(step) {
+      document.querySelectorAll('.step-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById(`step-${step}`).classList.remove('hidden');
+      document.getElementById('current-step-num').textContent = step;
+      
+      const pct = (step / totalSteps) * 100;
+      document.getElementById('progress-bar').style.width = `${pct}%`;
+
+      document.querySelectorAll('.step-tab').forEach(tab => {
+        const s = parseInt(tab.dataset.step);
+        const badge = tab.querySelector('span');
+        if (s === step) {
+          tab.className = "step-tab font-semibold text-hku-blue flex items-center gap-1";
+          badge.className = "w-5 h-5 rounded-full bg-hku-blue text-white flex items-center justify-center text-[10px]";
+        } else if (s < step) {
+          tab.className = "step-tab font-medium text-emerald-600 flex items-center gap-1";
+          badge.className = "w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-[10px]";
+        } else {
+          tab.className = "step-tab flex items-center gap-1 text-slate-400";
+          badge.className = "w-5 h-5 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px]";
+        }
+      });
+
+      // Buttons visibility
+      document.getElementById('prev-btn').classList.toggle('hidden', step === 1 || step === 'completion');
+      document.getElementById('next-btn').classList.toggle('hidden', step === totalSteps || step === 'completion');
+      document.getElementById('submit-btn').classList.toggle('hidden', step !== totalSteps);
+
+      hideError();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function validateCurrentStep() {
+      if (currentStep === 1) {
+        return document.getElementById('consent-check').checked;
+      }
+      if (currentStep === 2) {
+        return !!getRadioValue('age') && !!getRadioValue('gender') && !!getRadioValue('native_language') &&
+               !!getRadioValue('cantonese_proficiency') && !!getRadioValue('listen_frequency') &&
+               !!getRadioValue('music_training') && !!getRadioValue('sheet_music');
+      }
+      if (currentStep === 3) {
+        return listeningTasks.every(t => 
+          !!getRadioValue(`audio_${t.id}_naturalness`) &&
+          !!getRadioValue(`audio_${t.id}_fit`) &&
+          !!getRadioValue(`audio_${t.id}_understanding`) &&
+          !!getRadioValue(`audio_${t.id}_pronunciation`)
+        );
+      }
+      if (currentStep === 4) {
+        return !!getRadioValue('comp_1_natural') && !!getRadioValue('comp_1_intelligible') &&
+               !!getRadioValue('comp_1_fit') && !!getRadioValue('comp_1_professional');
+      }
+      if (currentStep === 5) {
+        return lyricTasks.every(t => !!getRadioValue(`lyric_${t.id}`));
+      }
+      if (currentStep === 6) {
+        return attitudeStatements.every(st => !!getRadioValue(`attitude_${st.id}`));
+      }
+      if (currentStep === 7) {
+        const q1 = document.getElementById('open-q1').value.trim();
+        const q2 = document.getElementById('open-q2').value.trim();
+        const prio = getRadioValue('creation_priority');
+        const reason = document.getElementById('priority-reason').value.trim();
+        return q1 !== '' && q2 !== '' && !!prio && reason !== '';
+      }
+      return true;
+    }
+
+    function showError(msg) {
+      const banner = document.getElementById('error-banner');
+      document.getElementById('error-message').textContent = msg;
+      banner.classList.remove('hidden');
+    }
+    function hideError() {
+      document.getElementById('error-banner').classList.add('hidden');
+    }
+
+    function getRadioValue(name) {
+      const el = document.querySelector(`input[name="${name}"]:checked`);
+      return el ? el.value : null;
+    }
+
+    function nextStep() {
+      if (!validateCurrentStep()) {
+        showError('請填妥本頁所有必填問題後再繼續。');
+        return;
+      }
+      if (currentStep < totalSteps) {
+        currentStep++;
+        showStep(currentStep);
+      }
+    }
+
+    function prevStep() {
+      if (currentStep > 1) {
+        currentStep--;
+        showStep(currentStep);
+      }
+    }
+
+    function submitForm() {
+      if (!validateCurrentStep()) {
+        showError('請填妥本頁所有必填問題後再提交。');
+        return;
+      }
+
+      // Collect data payload
+      const payload = {
+        timestamp: new Date().toISOString(),
+        age: getRadioValue('age'),
+        gender: getRadioValue('gender'),
+        native_language: getRadioValue('native_language'),
+        cantonese_proficiency: parseInt(getRadioValue('cantonese_proficiency')),
+        listen_frequency: getRadioValue('listen_frequency'),
+        music_training: getRadioValue('music_training'),
+        sheet_music: getRadioValue('sheet_music'),
+        part3_listening: listeningTasks.map(t => ({
+          audio_id: t.id,
+          isMatch: t.isMatch,
+          naturalness: parseInt(getRadioValue(`audio_${t.id}_naturalness`)),
+          fit: parseInt(getRadioValue(`audio_${t.id}_fit`)),
+          understanding: parseInt(getRadioValue(`audio_${t.id}_understanding`)),
+          pronunciation: parseInt(getRadioValue(`audio_${t.id}_pronunciation`))
+        })),
+        part4_comparison: {
+          natural: getRadioValue('comp_1_natural'),
+          intelligible: getRadioValue('comp_1_intelligible'),
+          fit: getRadioValue('comp_1_fit'),
+          professional: getRadioValue('comp_1_professional')
+        },
+        part5_lyrics: lyricTasks.map(t => ({
+          audio_id: t.id,
+          isMatch: t.isMatch,
+          selected: getRadioValue(`lyric_${t.id}`),
+          isCorrect: getRadioValue(`lyric_${t.id}`) === t.correct
+        })),
+        part6_attitudes: attitudeStatements.map(st => ({
+          statement_id: st.id,
+          score: parseInt(getRadioValue(`attitude_${st.id}`))
+        })),
+        part7_open: {
+          q1_characteristics: document.getElementById('open-q1').value.trim(),
+          q2_unnatural_notes: document.getElementById('open-q2').value.trim(),
+          priority: getRadioValue('creation_priority'),
+          priority_reason: document.getElementById('priority-reason').value.trim()
+        }
+      };
+
+      responsesDatabase.push(payload);
+      localStorage.setItem('hku_cantonese_responses', JSON.stringify(responsesDatabase));
+
+      updateResponseBadgeCount();
+
+      // Show completion screen
+      document.querySelectorAll('.step-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById('step-completion').classList.remove('hidden');
+      document.getElementById('nav-buttons-bar').classList.add('hidden');
+      document.getElementById('survey-progress-container').classList.add('hidden');
+    }
+
+    function resetFormForNewResponse() {
+      document.getElementById('questionnaire-form').reset();
+      currentStep = 1;
+      document.getElementById('nav-buttons-bar').classList.remove('hidden');
+      document.getElementById('survey-progress-container').classList.remove('hidden');
+      showStep(1);
+    }
+
+    function updateResponseBadgeCount() {
+      document.getElementById('response-count-badge').textContent = responsesDatabase.length;
+    }
+
+    // View Switcher (Survey Mode vs Dashboard Mode)
+    function switchView(mode) {
+      const surveyView = document.getElementById('survey-view');
+      const dashboardView = document.getElementById('dashboard-view');
+      const surveyBtn = document.getElementById('view-survey-btn');
+      const dashBtn = document.getElementById('view-dashboard-btn');
+      const progressContainer = document.getElementById('survey-progress-container');
+
+      if (mode === 'dashboard') {
+        surveyView.classList.add('hidden');
+        progressContainer.classList.add('hidden');
+        dashboardView.classList.remove('hidden');
+
+        surveyBtn.className = "px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 transition flex items-center gap-1.5 border border-slate-700";
+        dashBtn.className = "px-3 py-1.5 text-xs font-semibold rounded-lg bg-hku-blue text-white shadow transition flex items-center gap-1.5 border border-blue-400/30";
+
+        refreshDashboardAnalytics();
+      } else {
+        dashboardView.classList.add('hidden');
+        surveyView.classList.remove('hidden');
+        if (currentStep !== 'completion') {
+          progressContainer.classList.remove('hidden');
+        }
+
+        dashBtn.className = "px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 transition flex items-center gap-1.5 border border-slate-700";
+        surveyBtn.className = "px-3 py-1.5 text-xs font-semibold rounded-lg bg-hku-blue text-white shadow transition flex items-center gap-1.5 border border-blue-400/30";
+      }
+    }
+
+    // Data Generators & Export Handlers
+    function generateMockData() {
+      const mockAges = ["18-20", "21-25", "26-30", "31+"];
+      const mockLangs = ["粵語", "粵語", "粵語", "普通話", "英語"];
+      const mockGenders = ["男", "女", "女", "不願透露"];
+      const mockTrainings = ["沒有", "1–3年", "4–6年", "7年或以上"];
+      const mockPriorities = ["歌詞聲調", "音樂旋律", "兩者同樣重要"];
+
+      for (let i = 0; i < 15; i++) {
+        const isNative = Math.random() > 0.2;
+        const mockProf = isNative ? (Math.random() > 0.3 ? 7 : 6) : Math.floor(Math.random() * 4) + 2;
+
+        const payload = {
+          timestamp: new Date(Date.now() - Math.floor(Math.random() * 864000000)).toISOString(),
+          age: mockAges[Math.floor(Math.random() * mockAges.length)],
+          gender: mockGenders[Math.floor(Math.random() * mockGenders.length)],
+          native_language: isNative ? "粵語" : mockLangs[Math.floor(Math.random() * mockLangs.length)],
+          cantonese_proficiency: mockProf,
+          listen_frequency: "每週4–6次",
+          music_training: mockTrainings[Math.floor(Math.random() * mockTrainings.length)],
+          sheet_music: Math.random() > 0.5 ? "是" : "否",
+          part3_listening: listeningTasks.map(t => {
+            const base = t.isMatch ? 5.8 : 3.2;
+            const randOffset = () => (Math.random() * 1.6 - 0.8);
+            return {
+              audio_id: t.id,
+              isMatch: t.isMatch,
+              naturalness: Math.min(7, Math.max(1, Math.round(base + randOffset()))),
+              fit: Math.min(7, Math.max(1, Math.round(base + randOffset()))),
+              understanding: Math.min(7, Math.max(1, Math.round(base + (t.isMatch ? 0.5 : -0.5) + randOffset()))),
+              pronunciation: Math.min(7, Math.max(1, Math.round(base + randOffset())))
+            };
+          }),
+          part4_comparison: {
+            natural: Math.random() > 0.2 ? "A" : "B",
+            intelligible: Math.random() > 0.2 ? "A" : "B",
+            fit: Math.random() > 0.15 ? "A" : "B",
+            professional: Math.random() > 0.2 ? "A" : "沒有明顯差異"
+          },
+          part5_lyrics: lyricTasks.map(t => {
+            const passProb = t.isMatch ? 0.92 : 0.45;
+            const isCorrect = Math.random() < passProb;
+            return {
+              audio_id: t.id,
+              isMatch: t.isMatch,
+              selected: isCorrect ? t.correct : t.options[1],
+              isCorrect: isCorrect
+            };
+          }),
+          part6_attitudes: attitudeStatements.map(st => ({
+            statement_id: st.id,
+            score: Math.floor(Math.random() * 3) + 5
+          })),
+          part7_open: {
+            q1_characteristics: "歌詞協音、旋律與粵語九聲的走勢一致，聽落順口且流暢。",
+            q2_unnatural_notes: "錄音 2 及 4 歌詞有倒字情況，例如高音字配了低聲調，導致聽感怪異。",
+            priority: mockPriorities[Math.floor(Math.random() * mockPriorities.length)],
+            priority_reason: "粵語係聲調語言，若果聲調與旋律相差太遠會直接影響聽眾對歌詞的理解。"
+          }
+        };
+        responsesDatabase.push(payload);
+      }
+
+      localStorage.setItem('hku_cantonese_responses', JSON.stringify(responsesDatabase));
+      updateResponseBadgeCount();
+      refreshDashboardAnalytics();
+    }
+
+    function clearAllData() {
+      if (confirm('確定要清空所有已收集的問卷數據嗎？')) {
+        responsesDatabase = [];
+        localStorage.removeItem('hku_cantonese_responses');
+        updateResponseBadgeCount();
+        refreshDashboardAnalytics();
+      }
+    }
+
+    function exportJSONData() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(responsesDatabase, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `HKU_Cantonese_Tone_Study_Data_${Date.now()}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function exportCSVData() {
+      if (responsesDatabase.length === 0) {
+        alert('目前無可匯出的數據！');
+        return;
+      }
+
+      let csv = "Timestamp,Age,Gender,NativeLanguage,CantoneseProficiency,MusicTraining,ListenFrequency,LyricAccuracyRate,OpenQ1,PriorityPreference\n";
+      responsesDatabase.forEach(r => {
+        const correctCount = r.part5_lyrics.filter(l => l.isCorrect).length;
+        const acc = ((correctCount / r.part5_lyrics.length) * 100).toFixed(1);
+        const cleanQ1 = `"${(r.part7_open.q1_characteristics || '').replace(/"/g, '""')}"`;
+        csv += `${r.timestamp},${r.age},${r.gender},${r.native_language},${r.cantonese_proficiency},${r.music_training},${r.listen_frequency},${acc}%,${cleanQ1},${r.part7_open.priority}\n`;
+      });
+
+      const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", `HKU_Tone_Melody_Study_Raw_${Date.now()}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // Chart Instances Holder
+    let chartAgeInst, chartLangInst, chartMusicInst, chartMatchMismatchInst, chartCompInst, chartLyricMatchInst, chartAttitudeInst;
+
+    function refreshDashboardAnalytics() {
+      document.getElementById('stat-total-responses').textContent = responsesDatabase.length;
+
+      if (responsesDatabase.length === 0) {
+        document.getElementById('stat-avg-prof').textContent = "0.0 / 7";
+        document.getElementById('stat-lyric-accuracy').textContent = "0%";
+        document.getElementById('stat-music-ratio').textContent = "0%";
+        renderQualitativeTable([]);
+        return;
+      }
+
+      // Calculations
+      const avgProf = (responsesDatabase.reduce((acc, r) => acc + r.cantonese_proficiency, 0) / responsesDatabase.length).toFixed(1);
+      document.getElementById('stat-avg-prof').textContent = `${avgProf} / 7`;
+
+      let totalLyricQs = 0;
+      let totalLyricCorrect = 0;
+      responsesDatabase.forEach(r => {
+        r.part5_lyrics.forEach(l => {
+          totalLyricQs++;
+          if (l.isCorrect) totalLyricCorrect++;
+        });
+      });
+      const lyricAcc = ((totalLyricCorrect / totalLyricQs) * 100).toFixed(1);
+      document.getElementById('stat-lyric-accuracy').textContent = `${lyricAcc}%`;
+
+      const trainedCount = responsesDatabase.filter(r => r.music_training !== '沒有').length;
+      const musicRatio = ((trainedCount / responsesDatabase.length) * 100).toFixed(0);
+      document.getElementById('stat-music-ratio').textContent = `${musicRatio}%`;
+
+      // Render Charts
+      renderDemographicsCharts();
+      renderMatchVsMismatchChart();
+      renderForcedChoiceChart();
+      renderLyricMatchVsMismatchChart();
+      renderAttitudesChart();
+      renderQualitativeTable(responsesDatabase);
+    }
+
+    function renderDemographicsCharts() {
+      // Age Distribution
+      const ageCounts = { "18-20": 0, "21-25": 0, "26-30": 0, "31+": 0 };
+      responsesDatabase.forEach(r => { if (ageCounts[r.age] !== undefined) ageCounts[r.age]++; });
+
+      if (chartAgeInst) chartAgeInst.destroy();
+      chartAgeInst = new Chart(document.getElementById('chart-age'), {
+        type: 'doughnut',
+        data: {
+          labels: Object.keys(ageCounts),
+          datasets: [{
+            data: Object.values(ageCounts),
+            backgroundColor: ['#0055A5', '#C5A059', '#0D9488', '#64748B']
+          }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+      });
+
+      // Language Distribution
+      const langCounts = {};
+      responsesDatabase.forEach(r => {
+        langCounts[r.native_language] = (langCounts[r.native_language] || 0) + 1;
+      });
+
+      if (chartLangInst) chartLangInst.destroy();
+      chartLangInst = new Chart(document.getElementById('chart-language'), {
+        type: 'pie',
+        data: {
+          labels: Object.keys(langCounts),
+          datasets: [{
+            data: Object.values(langCounts),
+            backgroundColor: ['#002147', '#38BDF8', '#F59E0B', '#10B981']
+          }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+      });
+
+      // Music Training Distribution
+      const musicCounts = { "沒有": 0, "1–3年": 0, "4–6年": 0, "7年或以上": 0 };
+      responsesDatabase.forEach(r => { if (musicCounts[r.music_training] !== undefined) musicCounts[r.music_training]++; });
+
+      if (chartMusicInst) chartMusicInst.destroy();
+      chartMusicInst = new Chart(document.getElementById('chart-music'), {
+        type: 'bar',
+        data: {
+          labels: Object.keys(musicCounts),
+          datasets: [{
+            label: '人數',
+            data: Object.values(musicCounts),
+            backgroundColor: '#0055A5'
+          }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+      });
+    }
+
+    function renderMatchVsMismatchChart() {
+      let matchNat = 0, matchFit = 0, matchUnd = 0, matchPro = 0, matchCount = 0;
+      let misNat = 0, misFit = 0, misUnd = 0, misPro = 0, misCount = 0;
+
+      responsesDatabase.forEach(r => {
+        r.part3_listening.forEach(item => {
+          if (item.isMatch) {
+            matchNat += item.naturalness;
+            matchFit += item.fit;
+            matchUnd += item.understanding;
+            matchPro += item.pronunciation;
+            matchCount++;
+          } else {
+            misNat += item.naturalness;
+            misFit += item.fit;
+            misUnd += item.understanding;
+            misPro += item.pronunciation;
+            misCount++;
+          }
+        });
+      });
+
+      const avgMatch = matchCount ? [matchNat/matchCount, matchFit/matchCount, matchUnd/matchCount, matchPro/matchCount] : [0,0,0,0];
+      const avgMis = misCount ? [misNat/misCount, misFit/misCount, misUnd/misCount, misPro/misCount] : [0,0,0,0];
+
+      if (chartMatchMismatchInst) chartMatchMismatchInst.destroy();
+      chartMatchMismatchInst = new Chart(document.getElementById('chart-match-mismatch'), {
+        type: 'bar',
+        data: {
+          labels: ['自然度 (Naturalness)', '歌詞旋律配合度 (Fit)', '容易理解度 (Intelligibility)', '發音自然度 (Pronunciation)'],
+          datasets: [
+            { label: 'Tone-Melody Match (配合)', data: avgMatch.map(v => v.toFixed(2)), backgroundColor: '#10B981' },
+            { label: 'Tone-Melody Mismatch (不配合)', data: avgMis.map(v => v.toFixed(2)), backgroundColor: '#EF4444' }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: { y: { min: 1, max: 7, title: { display: true, text: 'Likert Score (1-7)' } } }
+        }
+      });
+    }
+
+    function renderForcedChoiceChart() {
+      let countA = 0, countB = 0, countNone = 0;
+      responsesDatabase.forEach(r => {
+        if (r.part4_comparison) {
+          Object.values(r.part4_comparison).forEach(val => {
+            if (val === 'A') countA++;
+            else if (val === 'B') countB++;
+            else countNone++;
+          });
+        }
+      });
+
+      if (chartCompInst) chartCompInst.destroy();
+      chartCompInst = new Chart(document.getElementById('chart-comparison'), {
+        type: 'doughnut',
+        data: {
+          labels: ['版本 A (Match)', '版本 B (Mismatch)', '沒有明顯差異'],
+          datasets: [{
+            data: [countA, countB, countNone],
+            backgroundColor: ['#002147', '#EF4444', '#94A3B8']
+          }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+      });
+    }
+
+    function renderLyricMatchVsMismatchChart() {
+      let matchCorrect = 0, matchTotal = 0;
+      let misCorrect = 0, misTotal = 0;
+
+      responsesDatabase.forEach(r => {
+        r.part5_lyrics.forEach(item => {
+          if (item.isMatch) {
+            matchTotal++;
+            if (item.isCorrect) matchCorrect++;
+          } else {
+            misTotal++;
+            if (item.isCorrect) misCorrect++;
+          }
+        });
+      });
+
+      const matchAcc = matchTotal ? ((matchCorrect / matchTotal) * 100).toFixed(1) : 0;
+      const misAcc = misTotal ? ((misCorrect / misTotal) * 100).toFixed(1) : 0;
+
+      if (chartLyricMatchInst) chartLyricMatchInst.destroy();
+      chartLyricMatchInst = new Chart(document.getElementById('chart-lyric-match'), {
+        type: 'bar',
+        data: {
+          labels: ['Tone-Melody Match', 'Tone-Melody Mismatch'],
+          datasets: [{
+            label: '正確率 (%)',
+            data: [matchAcc, misAcc],
+            backgroundColor: ['#0D9488', '#F59E0B']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: { y: { min: 0, max: 100, title: { display: true, text: '正確率 (%)' } } }
+        }
+      });
+    }
+
+    function renderAttitudesChart() {
+      const attitudeSums = [0, 0, 0, 0, 0, 0];
+      let total = responsesDatabase.length;
+
+      responsesDatabase.forEach(r => {
+        r.part6_attitudes.forEach((item, idx) => {
+          if (attitudeSums[idx] !== undefined) attitudeSums[idx] += item.score;
+        });
+      });
+
+      const averages = total ? attitudeSums.map(sum => (sum / total).toFixed(2)) : [0,0,0,0,0,0];
+
+      if (chartAttitudeInst) chartAttitudeInst.destroy();
+      chartAttitudeInst = new Chart(document.getElementById('chart-attitudes'), {
+        type: 'bar',
+        data: {
+          labels: ['Q1 留意歌詞', 'Q2 保留原聲調', 'Q3 歌詞比旋律重要', 'Q4 準確發音提質', 'Q5 旋律好聽可變調', 'Q6 聲調不一感覺不自然'],
+          datasets: [{
+            label: '平均同意度 (1–7)',
+            data: averages,
+            backgroundColor: '#0055A5'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: { y: { min: 1, max: 7 } }
+        }
+      });
+    }
+
+    function renderQualitativeTable(data) {
+      const tbody = document.getElementById('qualitative-table-body');
+      if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-6 text-center text-slate-400">尚無相關記錄。</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = data.map((r, idx) => `
+        <tr class="hover:bg-slate-50 transition">
+          <td class="px-4 py-3 font-mono font-bold text-slate-500">${idx + 1}</td>
+          <td class="px-4 py-3">
+            <span class="font-semibold text-slate-800">${r.age} / ${r.gender}</span><br>
+            <span class="text-slate-400">母語: ${r.native_language}</span>
+          </td>
+          <td class="px-4 py-3 max-w-xs text-slate-700">${r.part7_open.q1_characteristics || '無'}</td>
+          <td class="px-4 py-3 max-w-xs text-slate-700">${r.part7_open.q2_unnatural_notes || '無'}</td>
+          <td class="px-4 py-3">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-800">${r.part7_open.priority}</span>
+          </td>
+          <td class="px-4 py-3 max-w-xs text-slate-600">${r.part7_open.priority_reason || '無'}</td>
+        </tr>
+      `).join('');
+    }
+
+    function filterQualitativeTable() {
+      const query = document.getElementById('feedback-search').value.toLowerCase();
+      const filtered = responsesDatabase.filter(r => 
+        (r.part7_open.q1_characteristics || '').toLowerCase().includes(query) ||
+        (r.part7_open.q2_unnatural_notes || '').toLowerCase().includes(query) ||
+        (r.part7_open.priority_reason || '').toLowerCase().includes(query)
+      );
+      renderQualitativeTable(filtered);
+    }
+
+    // Initialization on window load
+    window.onload = function() {
+      renderListeningTasks();
+      renderComparisonTasks();
+      renderLyricTasks();
+      renderAttitudeTasks();
+      updateResponseBadgeCount();
+      lucide.createIcons();
+    }
+  </script>
+</body>
+</html>
